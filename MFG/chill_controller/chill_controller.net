@@ -1,0 +1,39 @@
+unnamed_net37	CONN2-7 ROOM_OW-1 
+unnamed_net36	CONN2-8 RADIATOR_OW-1 
+unnamed_net35	D1-A1 MOTOR_L-1 
+unnamed_net34	U3-8 Q3-3 
+unnamed_net33	U3-9 Q2-3 
+unnamed_net32	D1-A2 R2-1 230V_L-1 
+unnamed_net31	D1-G U4-4 
+unnamed_net30	R2-2 U4-6 
+unnamed_net29	U4-1 R1-1 
+unnamed_net28	CONN2-10 Vcc_IN-1 OW_VCC-1 R1-2 
+unnamed_net27	CONN2-2 Q4-2 
+unnamed_net26	OW_GND-1 CONN2-1 GND_IN-1 Q4-3 
+unnamed_net25	U4-2 Q4-1 
+unnamed_net24	U3-12 Q1-3 
+unnamed_net23	U3-5 U2-4 
+unnamed_net22	U3-7 U2-5 
+unnamed_net21	U3-10 U2-6 
+unnamed_net20	U3-11 U2-7 
+unnamed_net19	U3-4 U2-3 
+unnamed_net18	U3-3 U2-2 
+unnamed_net17	U3-1 U2-1 
+unnamed_net16	U3-2 U2-15 
+Vcc	CONN1-10 Q3-1 Q2-1 Q1-1 U2-16 U1-20 
+unnamed_net15	C2-2 CR1-2 U1-4 
+unnamed_net14	C1-2 CR1-1 U1-5 
+GND	CONN1-1 INPUT_GND-1 U2-8 U1-10 C2-1 C1-1 U1-1 
+unnamed_net13	Q2-2 U1-11 
+unnamed_net12	Q1-2 U1-9 
+unnamed_net11	U2-10 U1-8 
+unnamed_net10	U2-11 U1-7 
+unnamed_net9	U2-12 U1-6 
+unnamed_net8	U2-13 U1-3 
+unnamed_net7	U2-14 U1-2 
+unnamed_net6	CONN1-7 U1-19 
+unnamed_net5	CONN1-8 U1-18 
+unnamed_net4	Q3-2 U1-17 
+unnamed_net3	INPUT_MINUS-1 U1-16 
+unnamed_net2	INPUT_PLUS-1 U1-15 
+unnamed_net1	CONN1-2 U1-14 
