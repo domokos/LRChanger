@@ -8,22 +8,17 @@
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
-
 #include "Base.h"
 #include "uiBase.h"
 
-// Coil pulse state type
-typedef enum {PWM_OFF, PWM_ON} pwm_states;
+// Coil pin values
+#define CHANGER_COIL P1_6
+#define BLUETOOTH_COIL P1_7
+#define STATE_PIN P3_0
 
-// PWM pin values
-#define PWM_OUTPUT_OFF 0
-#define PWM_OUTPUT_ON 1
-
-// Define controller states
-typedef enum {
-  STARTUP,
-  CHANGER,
-  BLUETOOTH} controller_state_type;
-
+// Coil pulsing times in msec
+#define COIL_PULSE_TIME 200
+#define STATE_CHANGE_HOLD_TIME_SEC 2
+#define STARTUP_DELAY_SEC 2
 
 #endif /* CONTROLLER_H_ */

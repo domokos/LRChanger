@@ -8,178 +8,96 @@
 #include "Controller.h"
 
 controller_state_type controller_state;
+bool state_change_prohibited;
 
 // Must be called periodically to take care of pulse output
 void
-pulse_output(void)
+pulse_output(controller_state_type output)
 {
-  if (timeout_occured(PWM_TIMER, TIMER_SEC, pwm_wait_time))
+  // Activate the requested output
+  if (output == CHANGER)
     {
-      if(!pwm_active)
-        {
-          PWM_PIN = inactive_pwm_pin_value;
-          pwm_state = PWM_OFF;
-          return;
-        }
-      if (pwm_state == PWM_OFF)
-        {
-          pwm_wait_time = pwm_on_time;
-          PWM_PIN = PWM_OUTPUT_ON;
-          pwm_state = PWM_ON;
-        } else {  // If pwm_state == PWM_ON
-          pwm_wait_time = pwm_off_time;
-          PWM_PIN = PWM_OUTPUT_OFF;
-          pwm_state = PWM_OFF;
-        }
-      reset_timeout(PWM_TIMER, TIMER_SEC);
+      CHANGER_COIL = 1;
     }
-}
+  else
+    {
+      // output == BLUETOOTH
+      BLUETOOTH_COIL = 1;
+    }
 
+  // Wait for pulse duration
+  delay_msec(COIL_PULSE_TIME);
+
+  // Deactivate all outputs
+  CHANGER_COIL = 0;
+  BLUETOOTH_COIL = 0;
+}
 
 void
-operate_chilling_logic(void)
-{
-
-  int radiator_temp, room_temp;
-
-  if(reevaluate_chill_logic)
-    {
-      // reset need for evaluation
-      reevaluate_chill_logic = FALSE;
-
-      radiator_temp = get_filtered_mean_temp(RADIATOR_SENSOR);
-      room_temp = get_filtered_mean_temp(ROOM_SENSOR);
-
-      if (radiator_temp < 0 && icing_condition_counter < 0xffff)
-          icing_condition_counter++;
-        else if (icing_condition_counter > 0)
-          icing_condition_counter--;
-
-      switch (chiller_state)
-      {
-      case COOLING:
-        if (icing_condition_counter > ICING_CONDITION_THRESHOLD)
-          {
-            chiller_state = DEICING;
-            // Turn of cooling
-            pwm_on_time = 0;
-            pwm_off_time = 0;
-            pwm_active = FALSE;
-            inactive_pwm_pin_value = PWM_OUTPUT_OFF;
-            reset_timeout(DEICING_TIMER, TIMER_SEC);
-            break;
-          }
-        calculate_PWM_times(room_temp);
-        break;
-
-      case DEICING:
-        if(timeout_occured(PWM_TIMER, TIMER_SEC, DEICING_TIME_SEC))
-            {
-            // Exiting DEICING state
-            chiller_state = COOLING;
-            icing_condition_counter = 0;
-            calculate_PWM_times(room_temp);
-            }
-        break;
-      }
-    }
-}
-
-void handle_ui(void)
+handle_ui(void)
 {
   unsigned char input_event;
+  // Acquire input evenet
   input_event = do_ui();
 
+  // Allow state change if forbidden period has elapsed
+  if (state_change_prohibited
+      && timeout_occured(STATE_CHANGE_HOLD_TIMER, TIMER_SEC,
+      STATE_CHANGE_HOLD_TIME_SEC))
+    state_change_prohibited = FALSE;
+
+  // Handle the input event
   switch (input_event)
-  {
-  case NO_INPUT_EVENT:
-    if (ui_state == SETTING_TARGET_TEMP && timeout_occured( UI_STATE_TIMER, TIMER_MS, UI_STATE_RESET_TIME_MS))
-      ui_state = ACTUAL_TEMP_DISPLAY;
-    break;
-
-  case PLUS_INPUT_PRESSED:
-    if (ui_state == ACTUAL_TEMP_DISPLAY)
-      ui_state = SETTING_TARGET_TEMP;
-
-      // ui_state == SETTING_TARGET_TEMP
-      else if (target_temp < MAX_TARGET_TEMP)
-          target_temp++;
-
-    reset_timeout( UI_STATE_TIMER , TIMER_MS);
-    break;
-
-  case MINUS_INPUT_PRESSED:
-    if (ui_state == ACTUAL_TEMP_DISPLAY)
-        ui_state = SETTING_TARGET_TEMP;
-
-      // ui_state == SETTING_TARGET_TEMP
-      else if (target_temp > MIN_TARGET_TEMP)
-         target_temp--;
-
-    reset_timeout( UI_STATE_TIMER , TIMER_MS);
-    break;
-  }
-
-  if (ui_state == ACTUAL_TEMP_DISPLAY)
     {
-      set_display_temp(get_filtered_mean_temp(ROOM_SENSOR));
-      set_display_blink(FALSE);
+  case NO_INPUT_EVENT:
+    break;
 
-    // ui_state == SETTING_TARGET_TEMP
-    } else {
-       set_display_temp(target_temp);
-       set_display_blink(TRUE);
+  case INPUT_PRESSED:
+    if (state_change_prohibited)
+      break;
+
+    if (controller_state == CHANGER)
+      {
+        controller_state = BLUETOOTH;
+      }
+    else // controller_state == BLUETOOTH
+      {
+        controller_state = CHANGER;
+      }
+    display_state(controller_state);
+    state_change_prohibited = TRUE;
+    reset_timeout(STATE_CHANGE_HOLD_TIMER, TIMER_SEC);
+    break;
     }
 }
 
 void
 init_device(void)
 {
-  unsigned char i,j;
 
-  i = NR_OF_TEMP_SENSORS;
-  while (i--)
-    {
-    j = FILTER_BUFFER_LENGTH;
-    while (j--)
-      temperatures_buffer[i][j] = -199;
-    }
-  temp_buffer_index[RADIATOR_SENSOR] = 0;
-  temp_buffer_index[ROOM_SENSOR] = 0;
+  // Init variables
+  state_change_prohibited = FALSE;
+  CHANGER_COIL = 0;
+  BLUETOOTH_COIL = 0;
 
-  reset_timeout(TEMP_MEASUREMENT_TIMER, TIMER_SEC);
-
-  // Set initial resolutions to 12 bit
-  set_temp_resolution(0, TEMP_RESOLUTION_12BIT);
-  set_temp_resolution(1, TEMP_RESOLUTION_12BIT);
-
-  // We need to start a new conversion so it is complete on init
-  conv_complete = TRUE;
-
-  bus0_conv_initiated = bus1_conv_initiated = FALSE;
-  bus_to_address = 0;
-
-  // Reset PWM
-  pwm_on_time = 0;
-  pwm_off_time = 1;
-  pwm_state = PWM_OFF;
-  pwm_active = FALSE;
-  inactive_pwm_pin_value = PWM_OUTPUT_OFF;
-
-  //Set the initial target temp
-
-  target_temp = INITIAL_TARGET_TEMP;
-
+  // Init the UI
   init_ui();
-  set_display_temp(get_filtered_mean_temp(ROOM_SENSOR));
 
-  // Init chill logic
-  reevaluate_chill_logic = FALSE;
-  icing_condition_counter = 0;
-  chiller_state = COOLING;
+  // Acquire the current state from the feedback line
+  if (STATE_PIN)
+    {
+      controller_state = CHANGER;
+    }
+  else
+    {
+      controller_state = BLUETOOTH;
+    }
 
-  // Reset UI state
-  ui_state = ACTUAL_TEMP_DISPLAY;
+  // Display the state on the UI LED
+  display_state(controller_state);
+
+  // Wait until input line is settled
+  delay_sec(STARTUP_DELAY_SEC);
 }
 
 void
@@ -195,12 +113,6 @@ main(void)
   while (TRUE)
     {
       // Operate main device functions and sets reevaluate_chill_logic flag if change is detected
-      operate_onewire_temp_measurement();
       handle_ui();
-
-      operate_chilling_logic();
-
-      operate_PWM();
-
     }
 }
