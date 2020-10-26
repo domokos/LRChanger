@@ -12,7 +12,7 @@ bool state_change_prohibited;
 
 // Must be called periodically to take care of pulse output
 void
-pulse_output(controller_state_type output)
+pulse_output (controller_state_type output)
 {
   // Activate the requested output
   if (output == CHANGER)
@@ -26,7 +26,7 @@ pulse_output(controller_state_type output)
     }
 
   // Wait for pulse duration
-  delay_msec(COIL_PULSE_TIME);
+  delay_msec (COIL_PULSE_TIME_MSEC);
 
   // Deactivate all outputs
   CHANGER_COIL = 0;
@@ -34,46 +34,54 @@ pulse_output(controller_state_type output)
 }
 
 void
-handle_ui(void)
+handle_ui (void)
 {
   unsigned char input_event;
   // Acquire input evenet
-  input_event = do_ui();
+  input_event = do_ui ();
 
   // Allow state change if forbidden period has elapsed
   if (state_change_prohibited
-      && timeout_occured(STATE_CHANGE_HOLD_TIMER, TIMER_SEC,
+      && timeout_occured (STATE_CHANGE_HOLD_TIMER, TIMER_SEC,
       STATE_CHANGE_HOLD_TIME_SEC))
     state_change_prohibited = FALSE;
 
   // Handle the input event
   switch (input_event)
     {
-  case NO_INPUT_EVENT:
-    break;
-
-  case INPUT_PRESSED:
-    if (state_change_prohibited)
+    case NO_INPUT_EVENT:
       break;
 
-    if (controller_state == CHANGER)
-      {
-        controller_state = BLUETOOTH;
-      }
-    else // controller_state == BLUETOOTH
-      {
-        controller_state = CHANGER;
-      }
-    display_state(controller_state);
-    state_change_prohibited = TRUE;
-    reset_timeout(STATE_CHANGE_HOLD_TIMER, TIMER_SEC);
-    break;
+    case INPUT_PRESSED:
+      // User activity detected maintain on state
+      reset_timeout (POWER_HOLDOFF_TIMER, TIMER_SEC);
+
+      if (state_change_prohibited)
+	break;
+
+      if (controller_state == CHANGER)
+	{
+	  controller_state = BLUETOOTH;
+	}
+      else // controller_state == BLUETOOTH
+	{
+	  controller_state = CHANGER;
+	}
+      display_state (controller_state);
+      state_change_prohibited = TRUE;
+      reset_timeout (STATE_CHANGE_HOLD_TIMER, TIMER_SEC);
+      break;
     }
 }
 
 void
-init_device(void)
+init_device (void)
 {
+
+  // Enable power pin to maintain power to the controller
+  // and reset power holdoff timer
+  POWER_ENABLE_PIN = 1;
+  reset_timeout (POWER_HOLDOFF_TIMER, TIMER_SEC);
 
   // Init variables
   state_change_prohibited = FALSE;
@@ -81,7 +89,7 @@ init_device(void)
   BLUETOOTH_COIL = 0;
 
   // Init the UI
-  init_ui();
+  init_ui ();
 
   // Acquire the current state from the feedback line
   if (STATE_PIN)
@@ -94,25 +102,43 @@ init_device(void)
     }
 
   // Display the state on the UI LED
-  display_state(controller_state);
-
-  // Wait until input line is settled
-  delay_sec(STARTUP_DELAY_SEC);
+  display_state (controller_state);
 }
 
 void
-main(void)
+shutdown (void)
 {
-// Enable interrupts and initialize timer
-  EA = 1;
-  init_timer();
-// Initialize the device
-  init_device();
+  // Cut our own power
+  POWER_ENABLE_PIN = 0;
 
-// Start the main execution loop
+  // Disable interrupts
+  EA = 0;
+  // Initiate a terminal inifilite loop
+  while (TRUE)
+    {
+    }
+}
+
+void
+main (void)
+{
+  // Enable interrupts and initialize timer
+  EA = 1;
+  init_timer ();
+  // Initialize the device
+  init_device ();
+
+  // Start the main execution loop
   while (TRUE)
     {
       // Operate main device functions and sets reevaluate_chill_logic flag if change is detected
-      handle_ui();
+      handle_ui ();
+
+      // Check and shutdown if power holdoff time has expired
+      if (timeout_occured (POWER_HOLDOFF_TIMER, TIMER_SEC,
+      POWER_HOLDOFF_TIME_SEC))
+	{
+	  shutdown ();
+	}
     }
 }

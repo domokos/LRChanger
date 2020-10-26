@@ -24,7 +24,8 @@ typedef __bit bool;
 // Timeout id types
 typedef enum {
   DELAY_TIMEOUT=0,
-  STATE_CHANGE_HOLD_TIMER=1
+  STATE_CHANGE_HOLD_TIMER=1,
+  POWER_HOLDOFF_TIMER=2
 } timer_id_type;
 
 // Define the number of timers

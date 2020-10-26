@@ -15,10 +15,11 @@
 #define CHANGER_COIL P1_6
 #define BLUETOOTH_COIL P1_7
 #define STATE_PIN P3_0
+#define POWER_ENABLE_PIN P3_1
 
 // Coil pulsing times in msec
-#define COIL_PULSE_TIME 200
+#define COIL_PULSE_TIME_MSEC 200
 #define STATE_CHANGE_HOLD_TIME_SEC 2
-#define STARTUP_DELAY_SEC 2
+#define POWER_HOLDOFF_TIME_SEC 30
 
 #endif /* CONTROLLER_H_ */
