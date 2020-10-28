@@ -14,8 +14,8 @@
 // Coil pin values
 #define CHANGER_COIL P1_6
 #define BLUETOOTH_COIL P1_7
-#define STATE_PIN P3_0
-#define POWER_ENABLE_PIN P3_1
+#define STATE_PIN P1_5
+#define POWER_ENABLE_PIN P1_4
 
 // Coil pulsing times in msec
 #define COIL_PULSE_TIME_MSEC 200
