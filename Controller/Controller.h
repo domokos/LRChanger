@@ -12,10 +12,10 @@
 #include "uiBase.h"
 
 // Coil pin values
-#define CHANGER_COIL P1_7
-#define BLUETOOTH_COIL P1_6
-#define STATE_PIN P1_5
-#define POWER_ENABLE_PIN P1_4
+#define CHANGER_COIL P1_4
+#define BLUETOOTH_COIL P1_5
+#define STATE_PIN P1_6
+#define POWER_ENABLE_PIN P1_7
 
 // Coil pulsing times in msec
 #define COIL_PULSE_TIME_MSEC 200
