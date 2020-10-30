@@ -29,7 +29,7 @@ typedef enum {
 } timer_id_type;
 
 // Define the number of timers
-#define NR_OF_TIMERS 2
+#define NR_OF_TIMERS 3
 
 // Timer types
 typedef enum {TIMER_MS, TIMER_SEC} timer_type;
