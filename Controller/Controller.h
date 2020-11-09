@@ -17,6 +17,9 @@
 #define STATE_PIN P1_6
 #define POWER_ENABLE_PIN P1_7
 
+#define POWER_ENABLED 0
+#define POWER_DISABLED 1
+
 // Coil pulsing times in msec
 #define COIL_PULSE_TIME_MSEC 200
 #define STATE_CHANGE_HOLD_TIME_SEC 2

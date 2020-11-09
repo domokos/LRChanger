@@ -80,7 +80,7 @@ init_device (void)
 
   // Enable power pin to maintain power to the controller
   // and reset power holdoff timer
-  POWER_ENABLE_PIN = 1;
+  POWER_ENABLE_PIN = POWER_ENABLED;
   reset_timeout (POWER_HOLDOFF_TIMER, TIMER_SEC);
 
   // Init variables
@@ -109,7 +109,7 @@ void
 shutdown (void)
 {
   // Cut our own power
-  POWER_ENABLE_PIN = 0;
+  POWER_ENABLE_PIN = POWER_DISABLED;
 
   // Disable interrupts
   EA = 0;
