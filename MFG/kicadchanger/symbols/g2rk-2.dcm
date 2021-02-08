@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP G2RK-2
+D Compact, Industry-Standard double 2-pole relay, designed to switch 2A Signal Loads, Double-winding Latching
+K Double-winding Latching Relays with PCB Terminals
+F https://omronfs.omron.com/en_US/ecb/products/pdf/en-g2r.pdf
+$ENDCMP
+#
+#End Doc Library

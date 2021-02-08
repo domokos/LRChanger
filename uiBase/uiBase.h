@@ -28,7 +28,7 @@ struct input_event
 };
 
 // define UI pins
-#define INPUT_PIN P3_3
+#define INPUT_PIN P1_5
 #define UI_CHANGER_PIN P3_4
 #define UI_BT_PIN P3_5
 

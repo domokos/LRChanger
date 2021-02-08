@@ -12,9 +12,9 @@
 #include "uiBase.h"
 
 // Coil pin values
-#define CHANGER_COIL P1_4
-#define BLUETOOTH_COIL P1_5
-#define STATE_PIN P1_6
+#define CHANGER_COIL P3_2
+#define BLUETOOTH_COIL P3_3
+#define STATE_PIN P1_2
 #define POWER_ENABLE_PIN P1_7
 
 #define POWER_ENABLED 0
