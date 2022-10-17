@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "SPC")(type "KiCad")(uri "/home/doma/git/LRChanger/MFG/Models/Simulation_SPICE.kicad_sym")(options "")(descr ""))
+)

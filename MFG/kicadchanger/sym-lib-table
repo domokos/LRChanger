@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name lrchangerlib)(type Legacy)(uri ${KIPRJMOD}/symbols/g2rk-2.lib)(options "")(descr ""))
+  (lib (name "lrchangerlib")(type "Legacy")(uri "${KIPRJMOD}/symbols/g2rk-2.lib")(options "")(descr ""))
+  (lib (name "lrchanger-rescue")(type "Legacy")(uri "${KIPRJMOD}/lrchanger-rescue.lib")(options "")(descr ""))
 )
